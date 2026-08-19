@@ -27,9 +27,6 @@ const ghosts = [
 const input = new Input();
 let score = 0;
 let lives = 3;
-let gameTime = 0;
-let powerMode = false;
-let powerTimer = 0;
 let gameOver = false;
 let gameWon = false;
 
@@ -37,7 +34,6 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Draw maze walls
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       if (maze.grid[y][x] === '#') {
@@ -47,7 +43,6 @@ function draw() {
     }
   }
 
-  // Draw dots
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       if (maze.grid[y][x] === '.') {
@@ -62,7 +57,6 @@ function draw() {
   player.draw(ctx);
   ghosts.forEach(g => g.draw(ctx));
 
-  // HUD
   ctx.fillStyle = '#FFF';
   ctx.font = '14px monospace';
   ctx.fillText('Score: ' + score, TILE, ROWS * TILE + 20);
@@ -74,36 +68,25 @@ function update(dt) {
 
   const dir = input.getDirection();
   if (dir) player.setDirection(dir);
-  player.update(dt, maze);
-
-  // Power mode timer
-  if (powerMode) {
-    powerTimer -= dt;
-    if (powerTimer <= 0) powerMode = false;
-  }
+  const ate = player.update(dt);
+  if (ate) score += 10;
 
   ghosts.forEach(ghost => {
-    ghost.update(dt, maze, player, powerMode);
+    ghost.update(dt);
     if (ghost.x === player.x && ghost.y === player.y) {
-      if (powerMode) {
-        score += 200;
-        ghost.reset();
-      } else {
-        lives--;
-        if (lives <= 0) gameOver = true;
-        else { player.reset(1,1); ghosts.forEach(g => g.reset()); }
-      }
+      lives--;
+      if (lives <= 0) gameOver = true;
+      else { player.reset(1,1); ghosts.forEach(g => g.reset()); }
     }
   });
 
-  // Check win condition
-  let dotsRemaining = 0;
+  let dots = 0;
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
-      if (maze.grid[y][x] === '.') dotsRemaining++;
+      if (maze.grid[y][x] === '.') dots++;
     }
   }
-  if (dotsRemaining === 0) gameWon = true;
+  if (dots === 0) gameWon = true;
 }
 
 function loop(ts) {

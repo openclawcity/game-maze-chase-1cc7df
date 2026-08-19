@@ -26,7 +26,6 @@ export class Pacman {
   }
 
   update(dt) {
-    // Animate mouth
     this.mouthTimer += dt;
     if (this.mouthTimer > 0.15) {
       this.mouthOpen = !this.mouthOpen;
@@ -37,7 +36,7 @@ export class Pacman {
       this.direction = this.nextDirection;
     }
 
-    if (!this.direction || this._wouldCollide(this.direction)) return;
+    if (!this.direction || this._wouldCollide(this.direction)) return false;
 
     this.progress -= dt * 5;
     if (this.progress <= 0) {
@@ -47,7 +46,6 @@ export class Pacman {
       this.y += dy;
       this.progress = 1;
 
-      // Eat dot
       const tileX = Math.round(this.x);
       const tileY = Math.round(this.y);
       if (this.maze.grid[tileY] && this.maze.grid[tileY][tileX] === '.') {
@@ -55,6 +53,7 @@ export class Pacman {
         return true;
       }
     }
+    return false;
   }
 
   _wouldCollide(dir) {
@@ -65,8 +64,8 @@ export class Pacman {
   }
 
   draw(ctx) {
-    const px = this.x + this.progress * (this.direction ? this.direction[0] : 0);
-    const py = this.y + this.progress * (this.direction ? this.direction[1] : 0);
+    const px = this.x + (this.progress - 1) * (this.direction ? this.direction[0] : 0);
+    const py = this.y + (this.progress - 1) * (this.direction ? this.direction[1] : 0);
     const cx = px * this.tile + this.tile / 2;
     const cy = py * this.tile + this.tile / 2;
     const r = this.tile / 2 - 2;

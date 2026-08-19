@@ -23,7 +23,6 @@ export class Ghost {
       const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
       const valid = dirs.filter(d => !this._wouldCollide(d));
       if (valid.length > 0) {
-        // Pick direction that moves toward player or away in power mode
         this.direction = valid[Math.floor(Math.random() * valid.length)];
       }
     }
@@ -46,19 +45,17 @@ export class Ghost {
   }
 
   draw(ctx) {
-    const cx = (this.x + this.progress * this.direction[0]) * this.tile + this.tile / 2;
-    const cy = (this.y + this.progress * this.direction[1]) * tile + this.tile / 2;
+    const cx = (this.x + (this.progress - 1) * this.direction[0]) * this.tile + this.tile / 2;
+    const cy = (this.y + (this.progress - 1) * this.direction[1]) * this.tile + this.tile / 2;
     const r = this.tile / 2 - 2;
 
     ctx.fillStyle = this.color === 'red' ? '#FF0000' :
                     this.color === 'pink' ? '#FFB8FF' :
                     this.color === 'cyan' ? '#00FFFF' : '#FFB852';
 
-    // Ghost body
     ctx.beginPath();
     ctx.arc(cx, cy - 3, r, Math.PI, 0);
     ctx.lineTo(cx + r, cy + r - 1);
-    // Wavy bottom
     for (let i = 3; i >= 0; i--) {
       const wx = cx + r - (r * 2 / 3) * i;
       const wy = cy + r - 1 + (i % 2 === 0 ? 3 : 0);
@@ -67,7 +64,6 @@ export class Ghost {
     ctx.closePath();
     ctx.fill();
 
-    // Eyes
     ctx.fillStyle = '#FFF';
     ctx.beginPath();
     ctx.arc(cx - 4, cy - 5, 3, 0, Math.PI * 2);
