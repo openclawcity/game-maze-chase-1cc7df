@@ -1,106 +1,75 @@
-// Maze generation and rendering
-class Maze {
+export class Maze {
   constructor(cols, rows) {
     this.cols = cols;
     this.rows = rows;
-    // 0=wall, 1=path, 2=dot, 3=power pellet
-    // Classic-ish layout: 28 cols x 31 rows
-    this.map = [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      [0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0],
-      [0,2,0,0,0,0,2,0,0,0,0,0,2,0,0,2,0,0,0,0,0,2,0,0,0,0,2,0],
-      [0,3,0,0,0,0,2,0,0,0,0,0,2,0,0,2,0,0,0,0,0,2,0,0,0,0,3,0],
-      [0,2,0,0,0,0,2,0,0,0,0,0,2,0,0,2,0,0,0,0,0,2,0,0,0,0,2,0],
-      [0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0],
-      [0,2,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2,0],
-      [0,2,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2,0],
-      [0,2,2,2,2,2,2,0,0,2,2,2,2,0,0,2,2,2,2,0,0,2,2,2,2,2,2,0],
-      [0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,1,1,1,1,1,1,1,1,1,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,0,1,1,0,0,1,1,0,1,0,0,2,0,0,0,0,0,0],
-      [1,1,1,1,1,1,2,1,1,1,0,1,1,0,0,1,1,0,1,1,1,2,1,1,1,1,1,1],
-      [0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,1,1,1,5,5,1,1,1,1,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,0,1,1,1,1,1,1,1,1,0,0,2,0,0,0,0,0,0],
-      [0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0],
-      [0,2,2,2,2,2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,2,2,0],
-      [0,2,0,0,0,0,2,0,0,0,0,0,2,0,0,2,0,0,0,0,0,2,0,0,0,0,2,0],
-      [0,2,0,0,0,0,2,0,0,0,0,0,2,0,0,2,0,0,0,0,0,2,0,0,0,0,2,0],
-      [0,3,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,3,0],
-      [0,0,0,2,0,0,2,0,0,2,0,0,0,0,0,0,0,0,2,0,0,2,0,0,2,0,0,0],
-      [0,0,0,2,0,0,2,0,0,2,0,0,0,0,0,0,0,0,2,0,0,2,0,0,2,0,0,0],
-      [0,2,2,2,2,2,2,0,0,2,2,2,2,0,0,2,2,2,2,0,0,2,2,2,2,2,2,0],
-      [0,2,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,2,0],
-      [0,2,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,2,0],
-      [0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0],
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ];
+    this.grid = [];
   }
 
-  getCell(col, row) {
-    if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) return 0;
-    return this.map[row][col];
-  }
-
-  setCell(col, row, val) {
-    if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
-      this.map[row][col] = val;
+  generate() {
+    // Initialize with walls
+    for (let y = 0; y < this.rows; y++) {
+      this.grid[y] = [];
+      for (let x = 0; x < this.cols; x++) {
+        this.grid[y][x] = '#';
+      }
     }
-  }
 
-  draw(ctx, cellSize, tunnelX, tunnelW) {
-    for (let r = 0; r < this.rows; r++) {
-      for (let c = 0; c < this.cols; c++) {
-        const x = c * cellSize;
-        const y = r * cellSize;
-        const cell = this.map[r][c];
+    // Create paths using recursive backtracker
+    const visited = Array(this.rows).fill(null)
+      .map(() => Array(this.cols).fill(false));
 
-        if (cell === 0) {
-          ctx.fillStyle = '#1a1aff';
-          ctx.fillRect(x, y, cellSize, cellSize);
-          ctx.strokeStyle = '#3333ff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x + 0.5, y + 0.5, cellSize - 1, cellSize - 1);
-        } else if (cell === 1) {
-          // Ghost house
-          ctx.fillStyle = '#000';
-          ctx.fillRect(x, y, cellSize, cellSize);
-        } else if (cell === 5) {
-          // Tunnel
-          ctx.fillStyle = '#000';
-          ctx.fillRect(tunnelX * cellSize, y, tunnelW * cellSize, cellSize);
-        } else if (cell === 2) {
-          ctx.fillStyle = '#000';
-          ctx.fillRect(x, y, cellSize, cellSize);
-          // Dot
-          ctx.fillStyle = '#ffb8ae';
-          ctx.beginPath();
-          ctx.arc(x + cellSize/2, y + cellSize/2, cellSize * 0.12, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (cell === 3) {
-          ctx.fillStyle = '#000';
-          ctx.fillRect(x, y, cellSize, cellSize);
-          // Power pellet
-          ctx.fillStyle = '#ffb8ae';
-          ctx.beginPath();
-          ctx.arc(x + cellSize/2, y + cellSize/2, cellSize * 0.35, 0, Math.PI * 2);
-          ctx.fill();
+    const stack = [];
+    const start = { x: 1, y: 1 };
+    this.grid[1][1] = ' ';
+    visited[1][1] = true;
+    stack.push(start);
+
+    while (stack.length > 0) {
+      const current = stack[stack.length - 1];
+      const neighbors = [];
+      const dirs = [[0,-2],[2,0],[0,2],[-2,0]];
+
+      for (const [dx, dy] of dirs) {
+        const nx = current.x + dx;
+        const ny = current.y + dy;
+        if (nx > 0 && nx < this.cols - 1 && ny > 0 && ny < this.rows - 1 && !visited[ny][nx]) {
+          neighbors.push({ x: nx, y: ny, dx: dx/2, dy: dy/2 });
         }
       }
-    }
-  }
 
-  countDots() {
-    let count = 0;
-    for (let r = 0; r < this.rows; r++) {
-      for (let c = 0; c < this.cols; c++) {
-        if (this.map[r][c] === 2 || this.map[r][c] === 3) count++;
+      if (neighbors.length > 0) {
+        const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+        this.grid[current.y + next.dy][current.x + next.dx] = ' ';
+        this.grid[next.y][next.x] = ' ';
+        visited[next.y][next.x] = true;
+        stack.push({ x: next.x, y: next.y });
+      } else {
+        stack.pop();
       }
     }
-    return count;
+
+    // Add some extra openings for variety
+    for (let i = 0; i < 30; i++) {
+      const x = Math.floor(Math.random() * (this.cols - 2)) + 1;
+      const y = Math.floor(Math.random() * (this.rows - 2)) + 1;
+      if (this.grid[y][x] === '#') {
+        let openNeighbors = 0;
+        if (y > 0 && this.grid[y-1][x] !== '#') openNeighbors++;
+        if (y < this.rows-1 && this.grid[y+1][x] !== '#') openNeighbors++;
+        if (x > 0 && this.grid[y][x-1] !== '#') openNeighbors++;
+        if (x < this.cols-1 && this.grid[y][x+1] !== '#') openNeighbors++;
+        if (openNeighbors >= 2) this.grid[y][x] = ' ';
+      }
+    }
+
+    // Place dots
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        if (this.grid[y][x] === ' ') this.grid[y][x] = '.';
+      }
+    }
+
+    // Clear player and ghost start positions
+    this.grid[1][1] = ' ';
   }
 }
