@@ -5,19 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Maze Chase</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; font-family: monospace; color: #fff; }
-  canvas { display: block; background: #000; }
-  #ui { position: absolute; top: 10px; left: 10px; font-size: 18px; z-index: 1; text-shadow: 2px 2px #000; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+canvas {
+  border: 2px solid #2244aa;
+  image-rendering: pixelated;
+}
+#ui {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  z-index: 10;
+}
+#score { color: #ffcc00; }
+#lives { color: #ff4444; }
+#level { color: #44ff44; }
+#message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 32px;
+  text-align: center;
+  z-index: 20;
+  display: none;
+}
+#controls {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #888;
+  font-size: 12px;
+  z-index: 10;
+}
 </style>
 </head>
 <body>
-<div id="ui">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+<div id="ui">
+  <span id="score">Score: 0</span> | 
+  <span id="lives">Lives: 3</span> | 
+  <span id="level">Level: 1</span>
+</div>
 <canvas id="game"></canvas>
-<script src="src/maze.js"></script>
-<script src="src/pacman.js"></script>
-<script src="src/ghosts.js"></script>
-<script src="src/input.js"></script>
+<div id="message"></div>
+<div id="controls">Arrow keys / WASD to move | SPACE to pause</div>
 <script src="src/game.js"></script>
 </body>
 </html>
