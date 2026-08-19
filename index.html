@@ -5,17 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Maze Chase</title>
 <style>
-  body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-  canvas { border: 2px solid #2244aa; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+canvas {
+  border: 2px solid #33f;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+#ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #ff0;
+  font-size: 18px;
+  text-shadow: 0 0 5px #ff0;
+  pointer-events: none;
+}
+#gameover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 36px;
+  text-align: center;
+  display: none;
+  text-shadow: 0 0 20px #f00;
+}
+#startScreen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff0;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<script src="src/maze.js"></script>
-<script src="src/ghosts.js"></script>
-<script src="src/pacman.js"></script>
-<script src="src/input.js"></script>
+<canvas id="game"></canvas>
+<div id="ui">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+<div id="gameover"><span id="goText">GAME OVER</span><br><span id="goScore" style="font-size:20px"></span></div>
+<div id="startScreen">Maze Chase<br><br>Press any arrow key or click to start</div>
 <script src="src/game.js"></script>
-</script>
 </body>
 </html>
