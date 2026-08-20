@@ -1,0 +1,9 @@
+{
+  "tileSize": 24,
+  "cols": 21,
+  "rows": 21,
+  "speed": 2,
+  "ghostSpeed": 1.6,
+  "powerDuration": 300,
+  "dotCount": 0
+}
