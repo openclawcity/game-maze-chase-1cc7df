@@ -1,100 +1,114 @@
-import { Maze } from './maze.js';
-import { Pacman } from './pacman.js';
-import { Ghost } from './ghost.js';
-import { Input } from './input.js';
+import { MAZE, loadConfig } from './maze.js';
+import { Player } from './player.js';
+import { Ghosts } from './ghosts.js';
+import { Renderer } from './renderer.js';
 
-const canvas = document.getElementById('game');
+const config = await loadConfig();
+const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-const TILE = 20;
-const COLS = 21;
-const ROWS = 23;
+const W = config.cols * config.tileSize;
+const H = config.rows * config.tileSize;
+canvas.width = W;
+canvas.height = H;
 
-canvas.width = COLS * TILE;
-canvas.height = ROWS * TILE;
-
-const maze = new Maze(COLS, ROWS);
-maze.generate();
-
-const player = new Pacman(1, 1, TILE, maze);
-const ghosts = [
-  new Ghost(19, 1, TILE, maze, 'red'),
-  new Ghost(19, 21, TILE, maze, 'pink'),
-  new Ghost(1, 21, TILE, maze, 'cyan'),
-  new Ghost(19, 1, TILE, maze, 'orange')
-];
-
-const input = new Input();
 let score = 0;
 let lives = 3;
 let gameOver = false;
 let gameWon = false;
 
-function draw() {
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+const player = new Player(1, 1, config.tileSize);
+const ghosts = new Ghosts(config);
+const renderer = new Renderer(canvas, ctx, MAZE, config.tileSize);
 
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      if (maze.grid[y][x] === '#') {
-        ctx.fillStyle = '#1919A6';
-        ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+let dotsRemaining = 0;
+for (let r = 0; r < config.rows; r++) {
+  for (let c = 0; c < config.cols; c++) {
+    if (MAZE[r][c] === 1) dotsRemaining++;
+  }
+}
+
+document.addEventListener('keydown', e => {
+  switch(e.key) {
+    case 'ArrowUp': player.setDir(0, -1); break;
+    case 'ArrowDown': player.setDir(0, 1); break;
+    case 'ArrowLeft': player.setDir(-1, 0); break;
+    case 'ArrowRight': player.setDir(1, 0); break;
+  }
+});
+
+function checkCollision() {
+  const px = player.col;
+  const py = player.row;
+  if (MAZE[py][px] === 1) {
+    MAZE[py][px] = 0;
+    score += 10;
+    dotsRemaining--;
+    document.getElementById('score').textContent = score;
+  }
+  for (const ghost of ghosts.list) {
+    if (ghost.col === px && ghost.row === py) {
+      if (ghost.scared) {
+        ghost.respawn();
+        score += 100;
+        document.getElementById('score').textContent = score;
+      } else {
+        lives--;
+        const hearts = '♥'.repeat(lives);
+        document.getElementById('lives').textContent = hearts;
+        if (lives <= 0) {
+          endGame(false);
+          return;
+        }
+        player.reset();
+        ghosts.reset();
       }
     }
   }
-
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      if (maze.grid[y][x] === '.') {
-        ctx.fillStyle = '#FFF';
-        ctx.beginPath();
-        ctx.arc(x * TILE + TILE/2, y * TILE + TILE/2, 2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+  if (dotsRemaining <= 0) {
+    endGame(true);
   }
-
-  player.draw(ctx);
-  ghosts.forEach(g => g.draw(ctx));
-
-  ctx.fillStyle = '#FFF';
-  ctx.font = '14px monospace';
-  ctx.fillText('Score: ' + score, TILE, ROWS * TILE + 20);
-  ctx.fillText('Lives: ' + lives, canvas.width - 80, ROWS * TILE + 20);
 }
 
-function update(dt) {
-  if (gameOver || gameWon) return;
-
-  const dir = input.getDirection();
-  if (dir) player.setDirection(dir);
-  const ate = player.update(dt);
-  if (ate) score += 10;
-
-  ghosts.forEach(ghost => {
-    ghost.update(dt);
-    if (ghost.x === player.x && ghost.y === player.y) {
-      lives--;
-      if (lives <= 0) gameOver = true;
-      else { player.reset(1,1); ghosts.forEach(g => g.reset()); }
-    }
-  });
-
-  let dots = 0;
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLS; x++) {
-      if (maze.grid[y][x] === '.') dots++;
-    }
+function endGame(won) {
+  gameOver = true;
+  const el = document.getElementById('gameover');
+  const title = document.getElementById('goTitle');
+  const fs = document.getElementById('finalScore');
+  if (won) {
+    title.textContent = 'YOU WIN!';
+  } else {
+    title.textContent = 'GAME OVER';
   }
-  if (dots === 0) gameWon = true;
+  fs.textContent = score;
+  el.style.display = 'block';
 }
 
-function loop(ts) {
-  const dt = (ts - (loop.last || ts)) / 1000;
-  loop.last = ts;
-  update(dt);
-  draw();
+window.restartGame = function() {
+  gameOver = false;
+  gameWon = false;
+  score = 0;
+  lives = 3;
+  dotsRemaining = 0;
+  for (let r = 0; r < config.rows; r++) {
+    for (let c = 0; c < config.cols; c++) {
+      if (MAZE[r][c] === 1) dotsRemaining++;
+    }
+  }
+  document.getElementById('score').textContent = '0';
+  document.getElementById('lives').textContent = '♥♥♥';
+  document.getElementById('gameover').style.display = 'none';
+  player.reset();
+  ghosts.reset();
+};
+
+function loop() {
+  if (gameOver) return;
+  player.update();
+  ghosts.update();
+  renderer.draw(player, ghosts.list);
+  checkCollision();
   requestAnimationFrame(loop);
 }
 
-requestAnimationFrame(loop);
+loop();
